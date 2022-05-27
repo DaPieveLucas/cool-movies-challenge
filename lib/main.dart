@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:coolmovies/theme/main_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -44,10 +45,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      title: 'Cool Movies',
+      theme: MainTheme.standardTheme,
       home: const HomePage(),
     );
   }
