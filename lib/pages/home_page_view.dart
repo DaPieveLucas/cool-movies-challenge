@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../widgets/film_card_widget.dart';
 import '../widgets/sliver_widget.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,13 +15,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final ValueNotifier<Map<String, dynamic>?> _data = ValueNotifier(null);
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   Future<void> _fetchData() async {
     print('Fetching data...');
@@ -65,15 +59,25 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: SliverWidget(),
+    return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      body: SliverWidget(
+        sliverList: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => const FilmCardWidget(),
+            childCount: 200,
+          ),
+        ),
+      ),
     );
   }
 }
-      
-      
-      
-//       SingleChildScrollView(
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       // backgroundColor: Theme.of(context).backgroundColor,
+//       body: SingleChildScrollView(
 //         child: Padding(
 //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
 //           child: Center(
@@ -91,15 +95,6 @@ class _HomePageState extends State<HomePage> {
 //                   ),
 //                 ),
 //                 const SizedBox(height: 16),
-//                 TextButton.icon(
-//                   onPressed: _incrementCounter,
-//                   icon: const Icon(Icons.add),
-//                   label: Text('Increment: $_counter'),
-//                   style: TextButton.styleFrom(
-//                     primary: Colors.white,
-//                     backgroundColor: Colors.blue,
-//                   ),
-//                 ),
 //                 OutlinedButton.icon(
 //                   onPressed: _fetchData,
 //                   icon: const Icon(Icons.download),
@@ -134,4 +129,10 @@ class _HomePageState extends State<HomePage> {
 //         ),
 //       ),
 //     );
+//   }
+// }
+      
+      
+      
+//      
 

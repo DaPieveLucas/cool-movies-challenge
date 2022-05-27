@@ -1,30 +1,43 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_text_style.dart';
+import '../utils/app_images.dart';
+
 class SliverWidget extends StatelessWidget {
-  const SliverWidget({Key? key}) : super(key: key);
+  const SliverWidget({required this.sliverList, Key? key}) : super(key: key);
+
+  final SliverList sliverList;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
-          pinned: true,
-          expandedHeight: 150.0,
+          backgroundColor: Theme.of(context).primaryColor,
+          expandedHeight: 100.0,
           flexibleSpace: FlexibleSpaceBar(
-            title: const Text('Avaiable seats'),
-            background: Image.network(
-              'https://r-cf.bstatic.com/images/hotel/max1024x768/116/116281457.jpg',
-              fit: BoxFit.fitWidth,
+            centerTitle: true,
+            title: Text(
+              'Cool Movies',
+              textAlign: TextAlign.center,
+              style: HeadingFont.headingLargeWhite,
+            ),
+            background: ClipRRect(
+              borderRadius: BorderRadius.circular(17.0),
+              child: Image.asset(
+                AppImages.appBarBackground,
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
+          shape: const ContinuousRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30.0),
+              bottomRight: Radius.circular(30.0),
             ),
           ),
         ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return Text('this $index');
-            },
-          ),
-        ),
+        sliverList,
       ],
     );
   }
