@@ -4,6 +4,7 @@ class AppColors {
   static const primary = Color(0xff911A17);
   static const white = Color(0xffFFFFFF);
   static const black = Color(0xff1D1E1F);
+  static const gold = Color(0xffFFD700);
 }
 
 class GrayScale {

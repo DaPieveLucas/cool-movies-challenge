@@ -1,9 +1,8 @@
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:coolmovies/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import '../theme/app_text_style.dart';
+import '../pages/film_specifications_view.dart';
 import '../utils/app_images.dart';
+import 'film_description_widget.dart';
 
 class FilmCardWidget extends StatelessWidget {
   const FilmCardWidget({Key? key}) : super(key: key);
@@ -17,13 +16,23 @@ class FilmCardWidget extends StatelessWidget {
       ),
       height: 220,
       width: double.maxFinite,
-      child: Card(
-        elevation: 20,
-        child: Padding(
-          padding: const EdgeInsets.all(
-            5,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FilmSpecificationsView(),
+            ),
+          );
+        },
+        child: const Card(
+          elevation: 20,
+          child: Padding(
+            padding: EdgeInsets.all(
+              5,
+            ),
+            child: _CardContent(),
           ),
-          child: _CardContent(),
         ),
       ),
     );
@@ -31,11 +40,7 @@ class FilmCardWidget extends StatelessWidget {
 }
 
 class _CardContent extends StatelessWidget {
-  _CardContent({AutoSizeGroup? autoSizeGroup, Key? key})
-      : _autoSizeGroup = autoSizeGroup ?? AutoSizeGroup(),
-        super(key: key);
-
-  final AutoSizeGroup _autoSizeGroup;
+  const _CardContent({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,28 +62,7 @@ class _CardContent extends StatelessWidget {
         Expanded(
           flex: 3,
           child: LayoutBuilder(
-            builder: (context, constraints) => Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'Avengers Age of Ultron',
-                  style: DescriptionFont.movieCaption,
-                  textAlign: TextAlign.center,
-                ),
-                const Divider(
-                  color: AppColors.black,
-                ),
-                AutoSizeText(
-                  'Earth mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity.',
-                  style: DescriptionFont.movieSumarry,
-                  maxLines: 9,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  group: _autoSizeGroup,
-                ),
-              ],
-            ),
+            builder: (context, constraints) => FilmDescriptionWidget(),
           ),
         ),
       ],
