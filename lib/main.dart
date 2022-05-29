@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:coolmovies/theme/main_theme.dart';
+import 'package:coolmovies/utils/navigation_service.dart';
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -12,6 +13,9 @@ void main() async {
   await initHiveForFlutter();
 
   final HttpLink httpLink = HttpLink(
+    // 'https://api.spacex.land/graphql/',
+
+    //real url
     Platform.isAndroid
         ? 'http://10.0.2.2:5001/graphql'
         : 'http://localhost:5001/graphql',
@@ -44,6 +48,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Cool Movies',
       theme: MainTheme.standardTheme,

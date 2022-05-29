@@ -1,3 +1,4 @@
+import 'package:coolmovies/model/movies_model.dart';
 import 'package:coolmovies/theme/app_colors.dart';
 import 'package:coolmovies/utils/app_images.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,10 @@ import '../widgets/film_description_widget.dart';
 import '../widgets/film_rating_widget.dart';
 
 class FilmSpecificationsView extends StatelessWidget {
-  const FilmSpecificationsView({Key? key}) : super(key: key);
+  const FilmSpecificationsView({required this.moviesModel, Key? key})
+      : super(key: key);
+
+  final MoviesModel moviesModel;
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +57,11 @@ class FilmSpecificationsView extends StatelessWidget {
                         width: 140,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(15.0),
-                          child: Image.asset(AppImages.avengersPost),
+                          child: Image.network(moviesModel.imgUrl),
                         ),
                       ),
                       const FilmRatingWidget(),
-                      FilmDescriptionWidget(),
+                      FilmDescriptionWidget(moviesModel: moviesModel),
                     ],
                   ),
                 ),

@@ -1,15 +1,20 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:coolmovies/model/movies_model.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_text_style.dart';
 
 class FilmDescriptionWidget extends StatelessWidget {
-  FilmDescriptionWidget({AutoSizeGroup? autoSizeGroup, Key? key})
-      : _autoSizeGroup = autoSizeGroup ?? AutoSizeGroup(),
+  FilmDescriptionWidget({
+    required this.moviesModel,
+    AutoSizeGroup? autoSizeGroup,
+    Key? key,
+  })  : _autoSizeGroup = autoSizeGroup ?? AutoSizeGroup(),
         super(key: key);
 
   final AutoSizeGroup _autoSizeGroup;
+  final MoviesModel moviesModel;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +23,7 @@ class FilmDescriptionWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text(
-          'Avengers Age of Ultron',
+          moviesModel.title,
           style: DescriptionFont.movieCaption,
           textAlign: TextAlign.center,
         ),
@@ -26,7 +31,8 @@ class FilmDescriptionWidget extends StatelessWidget {
           color: AppColors.black,
         ),
         AutoSizeText(
-          'Earth mightiest heroes must come together and learn to fight as a team if they are going to stop the mischievous Loki and his alien army from enslaving humanity.',
+          //TODO tratar a data que vem da API
+          moviesModel.releaseDate,
           style: DescriptionFont.movieSumarry,
           maxLines: 9,
           textAlign: TextAlign.center,
