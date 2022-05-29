@@ -1,77 +1,72 @@
+import 'package:coolmovies/controller/home_page_controller.dart';
+import 'package:coolmovies/model/movies_model.dart';
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+
+import '../widgets/empty_state.dart';
 
 import '../widgets/film_card_widget.dart';
 import '../widgets/sliver_widget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({
-    Key? key,
-  }) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final ValueNotifier<Map<String, dynamic>?> _data = ValueNotifier(null);
+  final HomePageController controller = HomePageController();
 
-  Future<void> _fetchData() async {
-    print('Fetching data...');
-    final client = GraphQLProvider.of(context).value;
+  @override
+  void initState() {
+    super.initState();
 
-    final QueryResult result = await client.query(
-      QueryOptions(
-        document: gql(
-          r'''
-          query AllMovies {
-            allMovies {
-              nodes {
-                id
-                imgUrl
-                movieDirectorId
-                userCreatorId
-                title
-                releaseDate
-                nodeId
-                userByUserCreatorId {
-                  id
-                  name
-                  nodeId
-                }
-              }
-            }
-          }
-        ''',
-        ),
-      ),
-    );
-
-    if (result.hasException) {
-      print(result.exception.toString());
-    }
-
-    if (result.data != null) {
-      _data.value = result.data!['allMovies'];
-      print(result.data.toString());
-    }
+    controller.fetchMovies();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
-      body: SliverWidget(
-        sliverList: SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) => const FilmCardWidget(),
-            childCount: 200,
-          ),
-        ),
+      body: ValueListenableBuilder<List<MoviesModel>?>(
+        valueListenable: controller.data,
+        builder: (context, movies, _) {
+          if (movies == null) {
+            return const EmptyState();
+          }
+          return SliverWidget(
+            sliverList: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                ((context, index) {
+                  final MoviesModel movie = movies[index];
+
+                  return FilmCardWidget(
+                    moviesModel: movie,
+                  );
+                }),
+                childCount: movies.length,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 }
+
+        // if (result.hasException) {
+        //   return ExceptionWidget(exception: result.exception.toString());
+        // }
+        // if (result.isLoading) {
+        //   return const LoadingScreen();
+        // }
+
+        // final List? movies = result.data?['allMovies']['nodes'];
+
+        // if (movies == null) {
+        //   return const EmptyState();
+        // }
+
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -130,9 +125,3 @@ class _HomePageState extends State<HomePage> {
 //       ),
 //     );
 //   }
-// }
-      
-      
-      
-//      
-
