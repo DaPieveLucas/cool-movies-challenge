@@ -14,12 +14,12 @@ class MoviesReviewModel {
   }
   MoviesReviewModel({
     required this.body,
-    required this.id,
     required this.title,
     required this.rating,
+    this.id,
   });
   final String body;
-  final String id;
+  final String? id;
   final String title;
   final int rating;
 

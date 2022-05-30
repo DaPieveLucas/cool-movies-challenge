@@ -1,3 +1,4 @@
+import 'package:coolmovies/model/movies_reviw_model.dart';
 import 'package:coolmovies/utils/navigation_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -12,6 +13,7 @@ class HomePageRepository {
     print('Getting movies');
     final QueryResult result = await client.query(
       QueryOptions(
+        fetchPolicy: FetchPolicy.noCache,
         document: gql(
           r'''
           query AllMovies {
@@ -54,5 +56,56 @@ class HomePageRepository {
       return movies.map((e) => MoviesModel.fromMap(e)).toList();
     }
     return [];
+  }
+
+  Future<void> createReview(
+    MoviesReviewModel moviesReview,
+    MoviesModel moviesModel,
+  ) async {
+    final client = GraphQLProvider.of(
+      NavigationService.navigatorKey.currentState!.overlay!.context,
+    ).value;
+
+    print('Creating review');
+    final QueryResult result = await client.mutate(
+      MutationOptions(
+        document: gql(
+          '''
+          mutation {
+            createMovieReview(input: {
+              movieReview: {
+                title: "${moviesReview.title}",
+                body: "${moviesReview.body}",
+                rating: ${moviesReview.rating},
+                movieId: "${moviesModel.id}",
+                userReviewerId: "${moviesModel.userCreatorId}"
+              }})
+            {
+              movieReview {
+                id
+                title
+                body
+                rating
+                movieByMovieId {
+                  title
+                }
+                userByUserReviewerId {
+                  name
+                }
+              }
+            }
+          }
+        ''',
+        ),
+      ),
+    );
+
+    if (result.hasException) {
+      print(result.exception.toString());
+    }
+
+    if (result.data != null) {
+      print('review criada com sucesso');
+    }
   }
 }
