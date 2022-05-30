@@ -1,5 +1,6 @@
 import 'package:coolmovies/controller/home_page_controller.dart';
 import 'package:coolmovies/model/movies_model.dart';
+import 'package:coolmovies/model/movies_reviw_model.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/empty_state.dart';
@@ -39,9 +40,13 @@ class _HomePageState extends State<HomePage> {
               delegate: SliverChildBuilderDelegate(
                 ((context, index) {
                   final MoviesModel movie = movies[index];
+                  final MoviesReviewModel movieReview =
+                      movies[index].moviesReviewModel[index];
 
                   return FilmCardWidget(
-                    moviesModel: movie,
+                    movieModel: movie,
+                    moviesReviewModel: movieReview,
+                    moviesList: movies,
                   );
                 }),
                 childCount: movies.length,
@@ -53,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
+        //TODO tratar os outros estados
         // if (result.hasException) {
         //   return ExceptionWidget(exception: result.exception.toString());
         // }
@@ -68,60 +73,3 @@ class _HomePageState extends State<HomePage> {
         // }
 
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       // backgroundColor: Theme.of(context).backgroundColor,
-//       body: SingleChildScrollView(
-//         child: Padding(
-//           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//           child: Center(
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: <Widget>[
-//                 const Padding(
-//                   padding: EdgeInsets.only(top: 36.0),
-//                   child: Text(
-//                     '''Thank you for taking the time to take our test. We really appreciate it.
-// All the information on what is required can be found in the README at the root of this repo.
-// Please dont spend ages on this and just get through as much of it as you can.
-// Good luck! :)''',
-//                     textAlign: TextAlign.center,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-//                 OutlinedButton.icon(
-//                   onPressed: _fetchData,
-//                   icon: const Icon(Icons.download),
-//                   label: const Text('Fetch data'),
-//                 ),
-//                 const SizedBox(height: 16),
-//                 ValueListenableBuilder(
-//                   valueListenable: _data,
-//                   builder: (
-//                     BuildContext context,
-//                     Map<String, dynamic>? data,
-//                     Widget? _,
-//                   ) {
-//                     return data != null
-//                         ? Container(
-//                             padding: const EdgeInsets.all(8),
-//                             decoration: BoxDecoration(
-//                               color: Colors.grey[300],
-//                               border: Border.all(color: Colors.grey.shade700),
-//                               borderRadius: BorderRadius.circular(4),
-//                             ),
-//                             child: Text(
-//                               data.toString(),
-//                             ),
-//                           )
-//                         : Container();
-//                   },
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }

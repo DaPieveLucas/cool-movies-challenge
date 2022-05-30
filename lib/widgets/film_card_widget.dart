@@ -1,13 +1,21 @@
 import 'package:coolmovies/model/movies_model.dart';
+import 'package:coolmovies/model/movies_reviw_model.dart';
 import 'package:flutter/material.dart';
 
 import '../pages/film_specifications_view.dart';
-import 'film_description_widget.dart';
+import 'home_film_description_widget.dart';
 
 class FilmCardWidget extends StatelessWidget {
-  const FilmCardWidget({required this.moviesModel, Key? key}) : super(key: key);
+  const FilmCardWidget({
+    required this.moviesReviewModel,
+    required this.movieModel,
+    required this.moviesList,
+    Key? key,
+  }) : super(key: key);
 
-  final MoviesModel moviesModel;
+  final MoviesModel movieModel;
+  final MoviesReviewModel moviesReviewModel;
+  final List<MoviesModel> moviesList;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +31,9 @@ class FilmCardWidget extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  FilmSpecificationsView(moviesModel: moviesModel),
+              builder: (context) => FilmSpecificationsView(
+                movieModelReview: movieModel,
+              ),
             ),
           );
         },
@@ -35,8 +44,8 @@ class FilmCardWidget extends StatelessWidget {
               5,
             ),
             child: _CardContent(
-              movieImage: moviesModel.imgUrl,
-              moviesModel: moviesModel,
+              moviesModel: movieModel,
+              moviesReviewModel: moviesReviewModel,
             ),
           ),
         ),
@@ -48,12 +57,12 @@ class FilmCardWidget extends StatelessWidget {
 class _CardContent extends StatelessWidget {
   const _CardContent({
     required this.moviesModel,
-    required this.movieImage,
+    required this.moviesReviewModel,
     Key? key,
   }) : super(key: key);
 
-  final String movieImage;
   final MoviesModel moviesModel;
+  final MoviesReviewModel moviesReviewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +74,7 @@ class _CardContent extends StatelessWidget {
             builder: ((context, constraints) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(15.0),
-                child: Image.network(movieImage),
+                child: Image.network(moviesModel.imgUrl),
               );
             }),
           ),
@@ -73,8 +82,9 @@ class _CardContent extends StatelessWidget {
         Expanded(
           flex: 3,
           child: LayoutBuilder(
-            builder: (context, constraints) =>
-                FilmDescriptionWidget(moviesModel: moviesModel),
+            builder: (context, constraints) => HomeFilmDescriptionWidget(
+              moviesModel: moviesModel,
+            ),
           ),
         ),
       ],
