@@ -35,6 +35,8 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
   void initState() {
     super.initState();
 
+    controller.initializeReviews(widget.movieModelReview.moviesReviewModel);
+
     textBodyController = TextEditingController();
     textTitleController = TextEditingController();
   }
@@ -60,15 +62,34 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
         ),
         widget.movieModelReview,
       );
-      print(title);
-      print(body);
-      print('this -> $submitRating');
 
       textBodyController.clear();
       textTitleController.clear();
     }
 
-    Future<void> openDialog(BuildContext context) {
+    void editingReview(int index) {
+      Navigator.of(context).pop();
+
+      controller.editingReview(
+        MoviesReviewModel(
+          body: body,
+          title: title,
+          rating: submitRating.toInt(),
+          id: widget.movieModelReview.moviesReviewModel[index].id,
+        ),
+        widget.movieModelReview,
+        index,
+      );
+
+      textBodyController.clear();
+      textTitleController.clear();
+    }
+
+    Future<void> openDialog(
+      BuildContext context,
+      bool isEditing, {
+      int? index,
+    }) {
       return showDialog(
         context: context,
         builder: (context) {
@@ -128,10 +149,15 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: submit,
-                child: const Text('Submit'),
-              ),
+              isEditing
+                  ? TextButton(
+                      onPressed: () => editingReview(index ?? 0),
+                      child: const Text('Edit'),
+                    )
+                  : TextButton(
+                      onPressed: submit,
+                      child: const Text('Submit'),
+                    ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Cancel'),
@@ -143,8 +169,6 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
     }
 
     return Scaffold(
-      // depois que criar nova review, fazer novo get para pegar reviews
-      // criar edição para reviews
       appBar: AppBar(
         title: Text(
           'Summary',
@@ -175,59 +199,81 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
             ),
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () async => setState(() {
-                  refreshcontroller.fetchMovies();
-                }),
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: ((context, index) {
-                    final List<MoviesReviewModel> moviesReviewList =
-                        widget.movieModelReview.moviesReviewModel;
+                onRefresh: () async {
+                  await refreshcontroller.fetchMovies();
+                },
+                child: ValueListenableBuilder<List<MoviesReviewModel?>?>(
+                  valueListenable: controller.notifier,
+                  builder: (context, moviesReview, _) {
+                    return ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: ((context, index) {
+                        final List<MoviesReviewModel?>? moviesReviewList =
+                            moviesReview;
 
-                    return Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Card(
-                        color: GrayScale.gray100,
-                        child: ListTile(
-                          title: Column(
-                            children: [
-                              Text(
-                                'Review: ${moviesReviewList[index].title}',
-                                style: DescriptionFont.movieCaption,
+                        return Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Card(
+                            color: GrayScale.gray100,
+                            child: ListTile(
+                              title: Column(
+                                children: [
+                                  Text(
+                                    'Review: ${moviesReviewList![index]?.title}',
+                                    style: DescriptionFont.movieCaption,
+                                  ),
+                                  const Divider(
+                                    color: AppColors.black,
+                                  ),
+                                  AutoSizeText(
+                                    moviesReviewList[index]?.body ?? '',
+                                    style: DescriptionFont.movieSumarry,
+                                    maxLines: 9,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
                               ),
-                              const Divider(
-                                color: AppColors.black,
+                              subtitle: Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () => openDialog(
+                                        context,
+                                        true,
+                                        index: index,
+                                      ),
+                                      child: const Text('Edit'),
+                                    ),
+                                    RatingBarIndicator(
+                                      itemPadding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
+                                      rating: moviesReviewList[index]!
+                                          .rating
+                                          .toDouble(),
+                                      itemBuilder: (context, _) => const Icon(
+                                        Icons.star,
+                                        color: AppColors.gold,
+                                        size: 10,
+                                      ),
+                                      itemSize: 15,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              AutoSizeText(
-                                moviesReviewList[index].body,
-                                style: DescriptionFont.movieSumarry,
-                                maxLines: 9,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                          subtitle: Center(
-                            child: RatingBarIndicator(
-                              itemPadding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
-                              rating: moviesReviewList[index].rating.toDouble(),
-                              itemBuilder: (context, _) => const Icon(
-                                Icons.star,
-                                color: AppColors.gold,
-                                size: 10,
-                              ),
-                              itemSize: 15,
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
+                      itemCount: moviesReview!.length,
                     );
-                  }),
-                  itemCount: widget.movieModelReview.moviesReviewModel.length,
+                  },
                 ),
               ),
             ),
@@ -236,7 +282,7 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          openDialog(context);
+          openDialog(context, false);
         },
         child: const Icon(Icons.add),
         backgroundColor: AppColors.primary,

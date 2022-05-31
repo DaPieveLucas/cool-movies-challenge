@@ -9,6 +9,7 @@ class HomePageController {
   Future<void> fetchMovies() async {
     print('Fetching movies');
     final movies = await _repository.getMovies();
+
     data.value = movies;
   }
 }

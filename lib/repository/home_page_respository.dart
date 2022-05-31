@@ -108,4 +108,56 @@ class HomePageRepository {
       print('review criada com sucesso');
     }
   }
+
+  Future<void> editReview(
+    MoviesReviewModel moviesReview,
+    MoviesModel moviesModel,
+  ) async {
+    final client = GraphQLProvider.of(
+      NavigationService.navigatorKey.currentState!.overlay!.context,
+    ).value;
+
+    print('Editing review');
+    final QueryResult result = await client.mutate(
+      MutationOptions(
+        document: gql(
+          '''
+          mutation {
+            createMovieReview(input: {
+              movieReview: {
+                id: "${moviesReview.id}"
+                title: "${moviesReview.title}",
+                body: "${moviesReview.body}",
+                rating: ${moviesReview.rating},
+                movieId: "${moviesModel.id}",
+                userReviewerId: "${moviesModel.userCreatorId}"
+              }})
+            {
+              movieReview {
+                id
+                title
+                body
+                rating
+                movieByMovieId {
+                  title
+                }
+                userByUserReviewerId {
+                  name
+                }
+              }
+            }
+          }
+        ''',
+        ),
+      ),
+    );
+
+    if (result.hasException) {
+      print(result.exception.toString());
+    }
+
+    if (result.data != null) {
+      print('review editada com sucesso');
+    }
+  }
 }
