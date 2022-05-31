@@ -13,8 +13,6 @@ void main() async {
   await initHiveForFlutter();
 
   final HttpLink httpLink = HttpLink(
-    // 'https://api.spacex.land/graphql/',
-
     //real url
     Platform.isAndroid
         ? 'http://10.0.2.2:5001/graphql'
