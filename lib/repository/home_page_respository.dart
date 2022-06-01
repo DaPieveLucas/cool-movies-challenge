@@ -118,38 +118,24 @@ class HomePageRepository {
     ).value;
 
     print('Editing review');
-    final QueryResult result = await client.mutate(
-      MutationOptions(
-        document: gql(
-          '''
-          mutation {
-            createMovieReview(input: {
-              movieReview: {
-                id: "${moviesReview.id}"
-                title: "${moviesReview.title}",
-                body: "${moviesReview.body}",
-                rating: ${moviesReview.rating},
-                movieId: "${moviesModel.id}",
-                userReviewerId: "${moviesModel.userCreatorId}"
-              }})
-            {
-              movieReview {
-                id
-                title
-                body
-                rating
-                movieByMovieId {
-                  title
-                }
-                userByUserReviewerId {
-                  name
-                }
-              }
+
+    final String update = '''
+            mutation MoviewReviewById {
+          updateMovieReviewById(
+            input: {movieReviewPatch: {body: "${moviesReview.body}", rating: ${moviesReview.rating}, title: "${moviesReview.title}"}, id: "${moviesReview.id}"}
+          ) {
+            clientMutationId
+            movieReview {
+              body
+              title
+              rating
             }
           }
-        ''',
-        ),
-      ),
+        }
+    ''';
+
+    final QueryResult result = await client.mutate(
+      MutationOptions(document: gql(update)),
     );
 
     if (result.hasException) {
