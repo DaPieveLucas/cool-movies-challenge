@@ -1,21 +1,18 @@
-import 'package:coolmovies/model/movies_reviw_model.dart';
 import 'package:coolmovies/utils/navigation_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../model/movies_model.dart';
+import '../widgets/exception_widget.dart';
 
 class HomePageRepository {
-  Future<List<MoviesModel>> getMovies() async {
-    final client = GraphQLProvider.of(
-      NavigationService.navigatorKey.currentState!.overlay!.context,
-    ).value;
+  final _client = GraphQLProvider.of(
+    NavigationService.navigatorKey.currentState!.overlay!.context,
+  ).value;
 
+  Future<List<MoviesModel>> getMovies() async {
     print('Getting movies');
-    final QueryResult result = await client.query(
-      QueryOptions(
-        fetchPolicy: FetchPolicy.noCache,
-        document: gql(
-          r'''
+
+    const String moviesCallBack = r'''
           query AllMovies {
             allMovies {
               nodes {
@@ -42,108 +39,28 @@ class HomePageRepository {
               }
             }
           }
-        ''',
+        ''';
+
+    final QueryResult result = await _client.query(
+      QueryOptions(
+        fetchPolicy: FetchPolicy.noCache,
+        document: gql(
+          moviesCallBack,
         ),
       ),
     );
 
     if (result.hasException) {
-      print(result.exception.toString());
+      ExceptionWidget(
+        exception: result.exception.toString(),
+      );
     }
 
     if (result.data != null) {
       final List movies = result.data?['allMovies']['nodes'];
+
       return movies.map((e) => MoviesModel.fromMap(e)).toList();
     }
     return [];
-  }
-
-  Future<void> createReview(
-    MoviesReviewModel moviesReview,
-    MoviesModel moviesModel,
-  ) async {
-    final client = GraphQLProvider.of(
-      NavigationService.navigatorKey.currentState!.overlay!.context,
-    ).value;
-
-    print('Creating review');
-    final QueryResult result = await client.mutate(
-      MutationOptions(
-        document: gql(
-          '''
-          mutation {
-            createMovieReview(input: {
-              movieReview: {
-                title: "${moviesReview.title}",
-                body: "${moviesReview.body}",
-                rating: ${moviesReview.rating},
-                movieId: "${moviesModel.id}",
-                userReviewerId: "${moviesModel.userCreatorId}"
-              }})
-            {
-              movieReview {
-                id
-                title
-                body
-                rating
-                movieByMovieId {
-                  title
-                }
-                userByUserReviewerId {
-                  name
-                }
-              }
-            }
-          }
-        ''',
-        ),
-      ),
-    );
-
-    if (result.hasException) {
-      print(result.exception.toString());
-    }
-
-    if (result.data != null) {
-      print('review criada com sucesso');
-    }
-  }
-
-  Future<void> editReview(
-    MoviesReviewModel moviesReview,
-    MoviesModel moviesModel,
-  ) async {
-    final client = GraphQLProvider.of(
-      NavigationService.navigatorKey.currentState!.overlay!.context,
-    ).value;
-
-    print('Editing review');
-
-    final String update = '''
-            mutation MoviewReviewById {
-          updateMovieReviewById(
-            input: {movieReviewPatch: {body: "${moviesReview.body}", rating: ${moviesReview.rating}, title: "${moviesReview.title}"}, id: "${moviesReview.id}"}
-          ) {
-            clientMutationId
-            movieReview {
-              body
-              title
-              rating
-            }
-          }
-        }
-    ''';
-
-    final QueryResult result = await client.mutate(
-      MutationOptions(document: gql(update)),
-    );
-
-    if (result.hasException) {
-      print(result.exception.toString());
-    }
-
-    if (result.data != null) {
-      print('review editada com sucesso');
-    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:coolmovies/model/movies_model.dart';
 import 'package:coolmovies/model/movies_reviw_model.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/loading_screen.dart';
 import '../widgets/empty_state.dart';
 
 import '../widgets/film_card_widget.dart';
@@ -33,6 +34,9 @@ class _HomePageState extends State<HomePage> {
         valueListenable: controller.data,
         builder: (context, movies, _) {
           if (movies == null) {
+            return const LoadingScreen();
+          }
+          if (movies.isEmpty) {
             return const EmptyState();
           }
           return SliverWidget(
@@ -58,18 +62,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-        //TODO tratar os outros estados
-        // if (result.hasException) {
-        //   return ExceptionWidget(exception: result.exception.toString());
-        // }
-        // if (result.isLoading) {
-        //   return const LoadingScreen();
-        // }
-
-        // final List? movies = result.data?['allMovies']['nodes'];
-
-        // if (movies == null) {
-        //   return const EmptyState();
-        // }
-
-
