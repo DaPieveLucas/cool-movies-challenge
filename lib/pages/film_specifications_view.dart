@@ -4,17 +4,16 @@ import 'package:coolmovies/controller/specifications_page_controller.dart';
 import 'package:coolmovies/model/movies_model.dart';
 import 'package:coolmovies/model/movies_reviw_model.dart';
 import 'package:coolmovies/theme/app_colors.dart';
-import 'package:coolmovies/utils/app_images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../theme/app_text_style.dart';
 
 class FilmSpecificationsView extends StatefulWidget {
-  const FilmSpecificationsView({required this.movieModelReview, Key? key})
+  const FilmSpecificationsView({required this.movieModel, Key? key})
       : super(key: key);
 
-  final MoviesModel movieModelReview;
+  final MoviesModel movieModel;
 
   @override
   State<FilmSpecificationsView> createState() => _FilmSpecificationsViewState();
@@ -25,149 +24,27 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
       SpecificationsPageController();
 
   final HomePageController refreshcontroller = HomePageController();
-  late TextEditingController textBodyController;
-  late TextEditingController textTitleController;
-  String title = '';
-  String body = '';
-  double submitRating = 0.0;
 
   @override
   void initState() {
     super.initState();
 
-    controller.initializeReviews(widget.movieModelReview.moviesReviewModel);
+    controller.initializeReviews(widget.movieModel.moviesReviewModel);
 
-    textBodyController = TextEditingController();
-    textTitleController = TextEditingController();
+    controller.textBodyController;
+    controller.textTitleController;
   }
 
   @override
   void dispose() {
-    textBodyController.dispose();
-    textTitleController.dispose();
+    controller.textBodyController.dispose();
+    controller.textTitleController.dispose();
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    void submit() {
-      Navigator.of(context).pop();
-
-      controller.createReview(
-        MoviesReviewModel(
-          body: body,
-          title: title,
-          rating: submitRating.toInt(),
-        ),
-        widget.movieModelReview,
-      );
-
-      textBodyController.clear();
-      textTitleController.clear();
-    }
-
-    void editingReview(int index) {
-      Navigator.of(context).pop();
-
-      controller.editingReview(
-        MoviesReviewModel(
-          body: body,
-          title: title,
-          rating: submitRating.toInt(),
-          id: widget.movieModelReview.moviesReviewModel[index].id,
-        ),
-        widget.movieModelReview,
-        index,
-      );
-
-      textBodyController.clear();
-      textTitleController.clear();
-    }
-
-    Future<void> openDialog(
-      BuildContext context,
-      bool isEditing, {
-      int? index,
-    }) {
-      return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              'Moview review',
-              style: DescriptionFont.movieCaption,
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        title = value;
-                      });
-                    },
-                    autofocus: true,
-                    controller: textTitleController,
-                    decoration: const InputDecoration(
-                      hintText: 'title of review',
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextField(
-                    controller: textBodyController,
-                    onChanged: (value) {
-                      setState(() {
-                        body = value;
-                      });
-                    },
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: 'body of review',
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  RatingBar.builder(
-                    itemSize: 15,
-                    itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    itemBuilder: (context, _) => const Icon(
-                      Icons.star,
-                      color: AppColors.gold,
-                      size: 10,
-                    ),
-                    onRatingUpdate: (rating) {
-                      setState(() {
-                        submitRating = rating;
-                      });
-                    },
-                  )
-                ],
-              ),
-            ),
-            actions: [
-              isEditing
-                  ? TextButton(
-                      onPressed: () => editingReview(index ?? 0),
-                      child: const Text('Edit'),
-                    )
-                  : TextButton(
-                      onPressed: submit,
-                      child: const Text('Submit'),
-                    ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
-              )
-            ],
-          );
-        },
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -178,111 +55,105 @@ class _FilmSpecificationsViewState extends State<FilmSpecificationsView> {
         centerTitle: true,
         backgroundColor: AppColors.primary,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppImages.appBarBackground),
-            fit: BoxFit.cover,
+      body: Column(
+        children: [
+          SizedBox(
+            height: 130,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15.0),
+              child: Image.network(widget.movieModel.imgUrl),
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            SizedBox(
-              height: 130,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15.0),
-                child: Image.network(widget.movieModelReview.imgUrl),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  await refreshcontroller.fetchMovies();
-                },
-                child: ValueListenableBuilder<List<MoviesReviewModel?>?>(
-                  valueListenable: controller.notifier,
-                  builder: (context, moviesReview, _) {
-                    return ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemBuilder: ((context, index) {
-                        final List<MoviesReviewModel?>? moviesReviewList =
-                            moviesReview;
+          const SizedBox(
+            height: 10,
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await refreshcontroller.fetchMovies();
+              },
+              child: ValueListenableBuilder<List<MoviesReviewModel?>?>(
+                valueListenable: controller.notifier,
+                builder: (context, moviesReview, _) {
+                  return ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemBuilder: ((context, index) {
+                      final List<MoviesReviewModel?>? moviesReviewList =
+                          moviesReview;
 
-                        return Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Card(
-                            color: GrayScale.gray100,
-                            child: ListTile(
-                              title: Column(
+                      return Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Card(
+                          color: GrayScale.gray100,
+                          child: ListTile(
+                            title: Column(
+                              children: [
+                                Text(
+                                  'Review: ${moviesReviewList![index]?.title}',
+                                  style: DescriptionFont.movieCaption,
+                                ),
+                                const Divider(
+                                  color: AppColors.black,
+                                ),
+                                AutoSizeText(
+                                  moviesReviewList[index]?.body ?? '',
+                                  style: DescriptionFont.movieSumarry,
+                                  maxLines: 9,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
+                            subtitle: Center(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
-                                  Text(
-                                    'Review: ${moviesReviewList![index]?.title}',
-                                    style: DescriptionFont.movieCaption,
+                                  ElevatedButton(
+                                    onPressed: () => controller.openDialog(
+                                      true,
+                                      widget.movieModel,
+                                      index: index,
+                                      id: widget.movieModel
+                                          .moviesReviewModel[index].id,
+                                    ),
+                                    child: const Text('Edit'),
                                   ),
-                                  const Divider(
-                                    color: AppColors.black,
-                                  ),
-                                  AutoSizeText(
-                                    moviesReviewList[index]?.body ?? '',
-                                    style: DescriptionFont.movieSumarry,
-                                    maxLines: 9,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
+                                  RatingBarIndicator(
+                                    itemPadding: const EdgeInsets.symmetric(
+                                      horizontal: 4.0,
+                                    ),
+                                    rating: moviesReviewList[index]!
+                                        .rating
+                                        .toDouble(),
+                                    itemBuilder: (context, _) => const Icon(
+                                      Icons.star,
+                                      color: AppColors.gold,
+                                      size: 10,
+                                    ),
+                                    itemSize: 15,
                                   ),
                                 ],
                               ),
-                              subtitle: Center(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () => openDialog(
-                                        context,
-                                        true,
-                                        index: index,
-                                      ),
-                                      child: const Text('Edit'),
-                                    ),
-                                    RatingBarIndicator(
-                                      itemPadding: const EdgeInsets.symmetric(
-                                        horizontal: 4.0,
-                                      ),
-                                      rating: moviesReviewList[index]!
-                                          .rating
-                                          .toDouble(),
-                                      itemBuilder: (context, _) => const Icon(
-                                        Icons.star,
-                                        color: AppColors.gold,
-                                        size: 10,
-                                      ),
-                                      itemSize: 15,
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ),
                           ),
-                        );
-                      }),
-                      itemCount: moviesReview!.length,
-                    );
-                  },
-                ),
+                        ),
+                      );
+                    }),
+                    itemCount: moviesReview!.length,
+                  );
+                },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          openDialog(context, false);
+          controller.openDialog(false, widget.movieModel);
         },
         child: const Icon(Icons.add),
         backgroundColor: AppColors.primary,

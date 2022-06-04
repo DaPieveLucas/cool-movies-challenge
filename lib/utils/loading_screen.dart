@@ -5,8 +5,10 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CircularProgressIndicator(
-      semanticsLabel: 'Loading Movies',
+    return const Center(
+      child: CircularProgressIndicator(
+        semanticsLabel: 'Loading Movies',
+      ),
     );
   }
 }

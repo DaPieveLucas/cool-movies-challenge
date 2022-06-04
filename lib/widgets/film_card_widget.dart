@@ -32,7 +32,7 @@ class FilmCardWidget extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => FilmSpecificationsView(
-                movieModelReview: movieModel,
+                movieModel: movieModel,
               ),
             ),
           );
@@ -81,10 +81,8 @@ class _CardContent extends StatelessWidget {
         ),
         Expanded(
           flex: 3,
-          child: LayoutBuilder(
-            builder: (context, constraints) => HomeFilmDescriptionWidget(
-              moviesModel: moviesModel,
-            ),
+          child: HomeFilmDescriptionWidget(
+            moviesModel: moviesModel,
           ),
         ),
       ],
